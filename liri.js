@@ -7,7 +7,9 @@
 //get the keys from the keys.js document	
 var apiKeys = require("./keys.js");
 
-var twitterKeys = apiKeys.twitterKeys;
+
+//tried to store twitter keys in a variable on this file locally, but it was't working, so trying without.
+// var twitterKeys = apiKeys.twitterKeys;
 
 var fs = require('fs');
 var Spotify = require('spotify');
@@ -57,8 +59,8 @@ if (userSelection == "my-tweets"){
 
 // twitter function 
 function userTweets() {
-	var client = twitterKeys;
-	var params = {screen_name: 'skastuarz'};
+	var client = new twitter(apiKeys.twitterKeys);
+	var params = {screen_name: 'skastuarz', count: 20};
 
 	// twitter api call
 	client.get('statuses/user_timeline', params, function(error, timeline, response) {	
