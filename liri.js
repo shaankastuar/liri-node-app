@@ -166,10 +166,12 @@ function omdb(infoFromUserInput){
 function doWhatItSays(){
 	fs.readFile("random.txt", 'utf8', function(err, data){
 		if (err) throw err;
+//need to split the data at the comma to run it through spotify
+		var stuffFromRandom = data.split(',');
 
-		var things = data.split(',');
-		var partTwo = things[1];
-
-		mySpotify(partTwo);	
+		//grab the song from the newly created array
+		var runThruSpotify = stuffFromRandom[1];
+//run the song through spotify api call function
+		mySpotify(runThruSpotify);	
 	});
 }
