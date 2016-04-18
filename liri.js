@@ -59,7 +59,7 @@ if (userSelection == "my-tweets"){
 
 // twitter function 
 function userTweets() {
-	var client = new twitter(apiKeys.twitterKeys);
+	var client = new Twitter(apiKeys.twitterKeys);
 	var params = {screen_name: 'skastuarz', count: 20};
 
 	// twitter api call
