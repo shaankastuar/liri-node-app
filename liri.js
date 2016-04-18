@@ -1,4 +1,4 @@
-// // Makes connection to the keys file
+//get the keys from the keys.js document	
 var apiKeys = require("./keys.js");
 
 var twitterKeys = apiKeys.twitterKeys;
@@ -12,32 +12,56 @@ var colors = require('colors');
 var inputString = process.argv;
 
 // Parses the command line argument to capture the data
-var selections = inputString[2];
-var argumentOne = process.argv[3];
+var userSelection = inputString[2];
+var infoFromUserInput = process.argv[3];
 
-// Based on the selections we run the appropriate if statement
-if (selections == "my-tweets"){
-	myTweets();
-} else if (selections == "spotify-this-song"){
-	mySpotify(argumentOne);
-} else if (selections == "movie-this"){
-	omdb(argumentOne);
-} else if (selections == "do-what-it-says"){
+// check seletion to run correct statement
+if (userSelection == "my-tweets"){
+	userTweets();
+} else if (userSelection == "spotify-this-song"){
+	mySpotify(infoFromUserInput);
+} else if (userSelection == "movie-this"){
+	omdb(infoFromUserInput);
+} else if (userSelection == "do-what-it-says"){
 	doWhatItSays();
 }
 
+//switch function as well, either will work: 
 
-// Twitter function 
-function myTweets() {
+function switchRouting(userSelection, infoFromUserInput){
+  switch (userSelection) {
+    case "my-tweets":
+      TwitterCall();
+      break;
+    case "spotify-this-song":
+      SpotifyCall(infoFromUserInput);
+      break;
+    case "movie-this":
+      MovieCall(infoFromUserInput);
+      break;
+    case "do-what-it-says":
+      WhatitSaysCall();
+      break;
+    default:
+      userSelection = "No Command";
+      infoFromUserInput = "no arguments";
+      console.log("invalid command. Valid commands consist of: ");
+  }
+};
+switchRouting(userSelection, infoFromUserInput);
+
+
+// twitter function 
+function userTweets() {
 	var client = twitterKeys;
 	var params = {screen_name: 'scentfinder'};
 
-	// send out the call to the Twitter API
+	// twitter api call
 	client.get('statuses/user_timeline', params, function(error, timeline, response) {	
 		if (!error) {
 			for (tweet in timeline) {
 				if (tweet < 10) { 
-					// get the date of the tweet
+					// get tweet date
 					var tweetDate = new Date(timeline[tweet].created_at);
 
 					// log out the date and text of our latest tweets.
@@ -59,14 +83,14 @@ function myTweets() {
 	});
 }
 
-// Spotify function
-function mySpotify(argumentOne){
-	if(argumentOne === undefined){
-	 	argumentOne = "What's my age again";
+// spotify
+function mySpotify(infoFromUserInput){
+	if(infoFromUserInput === undefined){
+	 	infoFromUserInput = "What's my age again";
 	 }
 
-	// send out the call to the Spotify API
-	Spotify.search({ type: 'track', query: argumentOne }, function(error, data) {
+	// spotify api call
+	Spotify.search({ type: 'track', query: infoFromUserInput }, function(error, data) {
 	    if (!error) {	    
 		    var items = data.tracks.items;
 
@@ -90,14 +114,14 @@ function mySpotify(argumentOne){
 	});
 };
 
-// OMDB function
-function omdb(argumentOne){
-	 if(argumentOne === undefined){
-	 	argumentOne = 'Mr. Nobody';
+// omdb
+function omdb(infoFromUserInput){
+	 if(infoFromUserInput === undefined){
+	 	infoFromUserInput = 'Mr. Nobody';
 	 }
 
 	// send out the call to the OMDB API
-	 request('http://www.omdbapi.com/?t='+argumentOne+'&y=&plot=short&tomatoes=true&r=json', function(error, response, body) {
+	 request('http://www.omdbapi.com/?t='+infoFromUserInput+'&y=&plot=short&tomatoes=true&r=json', function(error, response, body) {
 		if (!error) {
 		   var json = JSON.parse(body);
 
