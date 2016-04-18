@@ -1,3 +1,9 @@
+// psueodcode: 
+// 1)get all required keys and store, make it accessible to this file 
+// 2) get the user input from the console
+// 3) create the functions to run the api calls and console.log the information (and append to log.txt)
+// 4) use either an if or switch function in order to run the correct function based on the user input
+
 //get the keys from the keys.js document	
 var apiKeys = require("./keys.js");
 
@@ -6,13 +12,11 @@ var twitterKeys = apiKeys.twitterKeys;
 var fs = require('fs');
 var Spotify = require('spotify');
 var request = require('request');
+//use for colors -- cool thing found from classmates
 var colors = require('colors');
 
-// Takes in all of the command line arguments
-var inputString = process.argv;
-
-// Parses the command line argument to capture the data
-var userSelection = inputString[2];
+// takes user inputted information from console
+var userSelection = process.argv[2];
 var infoFromUserInput = process.argv[3];
 
 // check seletion to run correct statement
@@ -28,33 +32,33 @@ if (userSelection == "my-tweets"){
 
 //switch function as well, either will work: 
 
-function switchRouting(userSelection, infoFromUserInput){
-  switch (userSelection) {
-    case "my-tweets":
-      TwitterCall();
-      break;
-    case "spotify-this-song":
-      SpotifyCall(infoFromUserInput);
-      break;
-    case "movie-this":
-      MovieCall(infoFromUserInput);
-      break;
-    case "do-what-it-says":
-      WhatitSaysCall();
-      break;
-    default:
-      userSelection = "No Command";
-      infoFromUserInput = "no arguments";
-      console.log("invalid command. Valid commands consist of: ");
-  }
-};
-switchRouting(userSelection, infoFromUserInput);
+// function switchRouting(userSelection, infoFromUserInput){
+//   switch (userSelection) {
+//     case "my-tweets":
+//       TwitterCall();
+//       break;
+//     case "spotify-this-song":
+//       SpotifyCall(infoFromUserInput);
+//       break;
+//     case "movie-this":
+//       MovieCall(infoFromUserInput);
+//       break;
+//     case "do-what-it-says":
+//       WhatitSaysCall();
+//       break;
+//     default:
+//       userSelection = "No Command";
+//       infoFromUserInput = "no arguments";
+//       console.log("you have entered an invalid command");
+//   }
+// };
+// switchRouting(userSelection, infoFromUserInput);
 
 
 // twitter function 
 function userTweets() {
 	var client = twitterKeys;
-	var params = {screen_name: 'scentfinder'};
+	var params = {screen_name: 'skastuarz'};
 
 	// twitter api call
 	client.get('statuses/user_timeline', params, function(error, timeline, response) {	
@@ -65,12 +69,14 @@ function userTweets() {
 					var tweetDate = new Date(timeline[tweet].created_at);
 
 					// log out the date and text of our latest tweets.
-					console.log("Tweet #".green + (parseInt(tweet) + 1) + " Date: ".green + tweetDate.toString().slice(0, 24)); 
+					console.log("Tweet #".blue + (parseInt(tweet) + 1) + " Date: ".blue + tweetDate.toString().slice(0, 24) + " "); 
 					console.log(timeline[tweet].text);
 		   			console.log("\n");
 
-					fs.appendFile('log.txt', " Tweet #" + (parseInt(tweet) + 1) + " Date: " + tweetDate.toString().slice(0, 24)); 
-					fs.appendFile('log.txt', timeline[tweet].text);
+		   			//adds to log.txt
+		   			fs.appendFile('log.txt', "Tweet #: " + (parseInt(tweet)+1) + "\n");
+		   			fs.appendFile('log.txt', timeline[tweet].text + "\n");
+		   			fs.appendFile('log.txt', "\n");
 				}
 				else {
 					return true;
@@ -85,27 +91,29 @@ function userTweets() {
 
 // spotify
 function mySpotify(infoFromUserInput){
+	//default blink 182 -- great choice for a default
 	if(infoFromUserInput === undefined){
 	 	infoFromUserInput = "What's my age again";
 	 }
 
-	// spotify api call
+	// spotify api call for other song requst
 	Spotify.search({ type: 'track', query: infoFromUserInput }, function(error, data) {
 	    if (!error) {	    
 		    var items = data.tracks.items;
 
 		    for (i=0; i<items.length; i++){
 			 		for (j=0; j<items[i].artists.length; j++){
-			    		console.log("Artist: ".green + items[i].artists[j].name);
+			    		console.log("Artist: ".blue + items[i].artists[j].name);
 			    	}
-		    	console.log("Song Name: ".green + items[i].name);
-		    	console.log("Preview Link of the song from Spotify: ".green + items[i].preview_url);
-		    	console.log("Album Name: ".green + items[i].album.name);
+		    	console.log("Song Name: ".blue + items[i].name);
+		    	console.log("Preview Link of the song from Spotify: ".blue + items[i].preview_url);
+		    	console.log("Album Name: ".blue + items[i].album.name);
 				console.log("\n");
 
 			 		for (k=0; k<items[i].artists.length; k++){
 			    		fs.appendFile('log.txt', " Artist: " + items[i].artists[k].name);
 			    	}
+			    	//apend to log.txt
     			fs.appendFile('log.txt', ", Song Name: " + items[i].name);
 		    	fs.appendFile('log.txt', ", Preview Link of the song from Spotify: "+items[i].preview_url);
 		    	fs.appendFile('log.txt', ", Album Name: "+items[i].album.name);
@@ -125,26 +133,31 @@ function omdb(infoFromUserInput){
 		if (!error) {
 		   var json = JSON.parse(body);
 
-		   console.log("Title: ".green + json.Title);
-		   console.log("Year: ".green + json.Year);
-		   console.log("IMDB Rating: ".green + json.imdbRating);
-		   console.log("Country: ".green + json.Country);
-		   console.log("Language: ".green + json.Language);
-		   console.log("Plot: ".green + json.Plot);
-		   console.log("Actors: ".green + json.Actors);
-		   console.log("Rotten Tomatoes rating: ".green + json.tomatoRating);
-		   console.log("Rotten Tomatoes URL: ".green + json.tomatoURL);
+		   console.log(colors.blue('Title: ') + json.Title);
+		   console.log(colors.blue('Year: ') + json.Year);
+		   console.log(colors.blue('Rated: ') + json.Rated);
+		   console.log(colors.blue('Country: ') + json.Country);
+		   console.log(colors.blue('Language: ') + json.Language);
+		   console.log(colors.blue('Director: ') + json.Director);
+		   console.log(colors.blue('Actors: ') + json.Actors);
+		   console.log(colors.blue('Plot: ') + json.Plot);
+		   console.log(colors.blue('imdbRating: ') + json.imdbRating);
+		   console.log(colors.blue('Rotten Tomatoes Rating: ') + json.tomatoRating);
+		   console.log(colors.blue('Rotten Tomatoes URL: ') + json.tomatoURL);
 		   console.log("\n");
-
-		   fs.appendFile('log.txt', "Title: " + json.Title + "\n");
-		   fs.appendFile('log.txt', "Year: " + json.Year + "\n");
-		   fs.appendFile('log.txt', "IMDB Rating: " + json.imdbRating + "\n");
-		   fs.appendFile('log.txt', "Country: " + json.Country + "\n");
-		   fs.appendFile('log.txt', "Language: " + json.Language + "\n");
-		   fs.appendFile('log.txt', "Plot: " + json.Plot + "\n");
-		   fs.appendFile('log.txt', "Actors: " + json.Actors + "\n");
-		   fs.appendFile('log.txt', "Rotten Tomatoes rating: " + json.tomatoRating + "\n");
-		   fs.appendFile('log.txt', "Rotten Tomatoes URL: " + json.tomatoURL + "\n");
+		   //apend to log.txt
+		   	fs.appendFile('log.txt', "\n");
+		   	fs.appendFile("log.txt", "\n" + "Title: " + json.Title + "\n");
+	  		fs.appendFile("log.txt", "Year: " + json.Year + "\n");
+	 		fs.appendFile("log.txt", "Rated: " + json.Rated + "\n");
+		   	fs.appendFile("log.txt", "Country: " + json.Country + "\n");
+		   	fs.appendFile("log.txt", "Language: " + json.Language + "\n");
+		   	fs.appendFile("log.txt", "Director: " + json.Director + "\n");
+		   	fs.appendFile("log.txt", "Actors: " + json.Actors + "\n");
+		   	fs.appendFile("log.txt", "Plot: " + json.Plot + "\n");
+		   	fs.appendFile("log.txt", "imdbRating: " + json.imdbRating + "\n");
+		   	fs.appendFile("log.txt", "Rotten Tomatoes Rating: " + json.tomatoRating + "\n");
+		   	fs.appendFile("log.txt", "Rotten Tomatoes URL: " + json.tomatoURL + "\n");
 		}
 	})
 }
